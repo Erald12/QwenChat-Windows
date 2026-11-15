@@ -1,0 +1,99 @@
+QWEN CHAT FOR WINDOWS - OFFLINE AI CHAT - SETUP AND USAGE
+=========================================================
+
+The app runs the AI model on your PC's processor: no account, no server. Your chats never leave the PC.
+The internet is only used to download a model in the Models menu.
+
+IMPORTANT: The Windows build has never been run on GitHub yet, so the first build may fail.
+Section 6 explains what to do then.
+
+
+1. GET THE APP
+--------------
+Option A - build it on GitHub (nothing to install):
+    1. Create a new repository on github.com (do NOT add a README).
+    2. In PowerShell:
+           cd D:\PythonProject\QwenChat-Windows
+           git init
+           git add .
+           git commit -m "Qwen Chat for Windows"
+           git branch -M main
+           git remote add origin https://github.com/<you>/<repo>.git
+           git push -u origin main
+    3. Repository -> Actions -> "Build Windows app". Wait for the green check (about 20 minutes).
+    4. Open the run -> Artifacts -> QwenChat-windows-x64 -> download and unzip it.
+
+Option B - build it on your PC:
+    Install "Build Tools for Visual Studio 2022" (choose "Desktop development with C++") and Git, then:
+        cd D:\PythonProject\QwenChat-Windows
+        powershell -ExecutionPolicy Bypass -File build_exe.ps1
+    The app is then in dist\QwenChat\
+
+
+2. START IT
+-----------
+    Open the QwenChat folder and double-click QwenChat.exe.
+    Keep all files of the folder together - QwenChat.exe needs the _internal folder next to it.
+    You can right-click QwenChat.exe -> "Send to" -> "Desktop (create shortcut)".
+
+    "Windows protected your PC"? The app isn't code-signed. Click "More info" -> "Run anyway".
+
+
+3. FIRST START: DOWNLOAD A MODEL
+--------------------------------
+    The Models menu opens by itself. Click Download next to a model:
+        Qwen2.5 1.5B     the best all-round answers (1.1 GB)
+        Qwen2.5 0.5B     faster, simpler answers (0.5 GB)
+    When the download is done, the app switches to it. After that, everything works offline.
+
+    Your own .gguf file: Models -> Open folder, copy it in, then Models -> Use.
+
+
+4. USING THE APP
+----------------
+    Enter            send
+    Shift+Enter      new line
+    Esc              stop the answer
+    Ctrl+N / New     new conversation
+    Select text      drag over any message with the mouse (double-click = word, triple-click = line,
+                     Ctrl+A = whole message), then Ctrl+C or right-click to copy
+    Copy             under an answer - copies the whole answer
+    Speaker          reads the answer aloud (click again to stop)
+    Microphone       Windows voice typing (same as Win+H) - speak, the words appear in the box
+
+    The window can be resized and maximized. It remembers its size and place, and always opens fully
+    on screen, even after a monitor was unplugged or the resolution changed.
+
+    The line under "Erald Bot" shows the speed after each answer, e.g. "12.3 tokens/s - context 20%".
+
+
+5. CHANGING SETTINGS
+--------------------
+    At the top of main.py (then rebuild):
+        N_CTX = 4096            how much of the chat the model remembers
+        MAX_REPLY_TOKENS = 1024 the longest answer
+        TEMPERATURE = 0.7       lower = more focused, higher = more creative
+        SYSTEM_PROMPT = "..."   the assistant's personality
+
+    Window reset: delete  %LOCALAPPDATA%\QwenChat\settings.json  (also forgets the chosen model).
+
+
+6. IF SOMETHING GOES WRONG
+--------------------------
+    The GitHub build fails (red X):
+        Open the failed step, copy the last ~50 lines and send them to Claude.
+
+    "Demo mode: chatbridge.dll was not found":
+        The app was started without the AI library. Use the QwenChat.exe from the GitHub build, or build
+        the library with native\build_windows.ps1.
+
+    The window stays black or the app closes at once:
+        Send Claude the log:  %LOCALAPPDATA%\QwenChat\qwenchat.log
+        You can also try OpenGL instead of DirectX: in PowerShell run
+            $env:KIVY_GL_BACKEND="glew"; .\QwenChat.exe
+
+    Very slow (under 3 tokens/s):
+        Use Qwen2.5 0.5B, close heavy programs, and keep the laptop plugged in.
+
+    The app closes when the model loads, on a PC from before ~2013:
+        The CPU lacks AVX2. Rebuild with AVX2 unchecked (Actions -> Build Windows app -> Run workflow).

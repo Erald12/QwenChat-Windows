@@ -1,0 +1,14 @@
+# Python packages for running main.py on Windows and for building QwenChat.exe.
+#   pip install -r requirements.txt
+
+# UI. [base] adds the Windows graphics libraries: SDL2, GLEW and ANGLE (DirectX)
+kivy[base]==2.3.1
+
+# Reading replies aloud with the Windows voices (SAPI)
+pywin32>=306; sys_platform == "win32"
+
+# HTTPS certificates for model downloads inside the .exe
+certifi
+
+# Builds QwenChat.exe (qwenchat.spec)
+pyinstaller==6.11.1

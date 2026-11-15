@@ -1,0 +1,13 @@
+# build outputs
+build/
+dist/
+libs/
+native/llama.cpp/
+native/build-windows/
+.venv-build/
+__pycache__/
+*.zip
+
+# models are downloaded by the app (GitHub refuses files over 100 MB)
+models/*.gguf
+models/*.part
