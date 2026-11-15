@@ -65,6 +65,7 @@ jobs:
         run: python -m py_compile main.py
 
       - name: Build QwenChat.exe with PyInstaller
+        timeout-minutes: 15    # normally 2-4 min; a hang (e.g. a Kivy error MessageBox) fails fast
         run: pyinstaller --noconfirm qwenchat.spec
 
       - name: Zip the app

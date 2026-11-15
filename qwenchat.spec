@@ -14,9 +14,22 @@ else:
     print("WARNING: libs\\chatbridge.dll is missing - the .exe will run in demo mode. "
           "Build it first with native\\build_windows.ps1")
 
-deps = get_deps_minimal(video=None, audio=None, camera=None, spelling=None)
+# Name every Kivy provider explicitly. For any core module left at its default (True),
+# get_deps_minimal() *imports* it to see which provider loads - and importing kivy.core.window
+# opens a real window. On a GitHub runner (no GPU, OpenGL 1.1) Kivy then shows a "Minimum required
+# OpenGL version" MessageBox that nobody can click, and the build hangs until the job times out.
+# Image is listed by hand because its providers are named img_* (get_deps_minimal assumes image_*).
+deps = get_deps_minimal(
+    video=None, audio=None, camera=None, spelling=None,
+    window="sdl2", text="sdl2", clipboard="winctypes", image=None,
+)
+deps["excludes"] = [m for m in deps["excludes"] if not m.startswith("kivy.core.image")]
 deps["binaries"] = deps.get("binaries", []) + binaries
-deps["hiddenimports"] = deps.get("hiddenimports", []) + ["win32com.client", "certifi"]
+deps["hiddenimports"] = deps.get("hiddenimports", []) + [
+    "kivy.core.image", "kivy.core.image.img_tex", "kivy.core.image.img_dds",
+    "kivy.core.image.img_sdl2", "kivy.core.image.img_pil",
+    "win32com.client", "certifi",
+]
 
 a = Analysis(
     ["main.py"],
