@@ -11,7 +11,7 @@ main.py  (Kivy UI + ChatEngine)          QwenChat.exe (cx_Freeze, Python 3.12)
 chatbridge.dll  (native/chat_bridge.cpp + llama.cpp, statically linked, MSVC x64, AVX2)
    │
    ▼
-%LOCALAPPDATA%\QwenChat\models\*.gguf    memory-mapped
+<app folder>\models\*.gguf             memory-mapped
 ```
 
 `native/chat_bridge.cpp` is the Android bridge with one change: Windows exports via
@@ -65,8 +65,8 @@ logic as on the phone halves the context if a model doesn't fit the budget.
 
 | | Path |
 |---|---|
-| Downloaded models, `settings.json`, log | `%LOCALAPPDATA%\QwenChat\` |
-| Your own `.gguf` (alternative) | a `models` folder next to `QwenChat.exe` (or `main.py`) |
+| Downloaded models and your own `.gguf` | the `models` folder next to `QwenChat.exe` (or `main.py`) |
+| `settings.json`, log | `%LOCALAPPDATA%\QwenChat\` |
 | chatbridge.dll | inside the app folder, or `libs\` when running `main.py` |
 
 ## Build

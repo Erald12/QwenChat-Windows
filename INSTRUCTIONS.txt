@@ -45,6 +45,7 @@ Option B - build it on your PC:
         Qwen2.5 1.5B     the best all-round answers (1.1 GB)
         Qwen2.5 0.5B     faster, simpler answers (0.5 GB)
     When the download is done, the app switches to it. After that, everything works offline.
+    Models are saved in the "models" folder inside the extracted QwenChat folder.
 
     Your own .gguf file: Models -> Open folder, copy it in, then Models -> Use.
 

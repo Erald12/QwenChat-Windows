@@ -237,8 +237,27 @@ SYSTEM_PROMPT = ("You are Erald Bot, a helpful assistant that runs offline on th
                  "Write math as plain text with Unicode symbols, like x² + 3x = 10, √2, ½, π, ≤, "
                  "never LaTeX.")
 
-MODEL_DIR = os.path.join(DATA_DIR, "models")           # Models menu downloads go here
-BUNDLED_MODEL_DIR = os.path.join(APP_DIR, "models")    # or copy a .gguf next to the app yourself
+# Models live in a "models" folder next to QwenChat.exe / main.py (the extracted folder), so the app
+# stays portable: copy or delete the whole folder and the models go with it.
+BUNDLED_MODEL_DIR = os.path.join(APP_DIR, "models")
+# Older versions downloaded into %LOCALAPPDATA%\QwenChat\models: still found there, never written to
+# unless the app folder is read-only (e.g. extracted under Program Files).
+LEGACY_MODEL_DIR = os.path.join(DATA_DIR, "models")
+
+
+def _writable_dir(folder):
+    try:
+        os.makedirs(folder, exist_ok=True)
+        probe = os.path.join(folder, ".write_test")
+        with open(probe, "w") as file:
+            file.write("ok")
+        os.remove(probe)
+        return True
+    except OSError:
+        return False
+
+
+MODEL_DIR = BUNDLED_MODEL_DIR if _writable_dir(BUNDLED_MODEL_DIR) else LEGACY_MODEL_DIR  # downloads go here
 LIBRARY_NAME = "chatbridge.dll" if IS_WINDOWS else "libchatbridge.so"
 
 def total_memory_mb():
@@ -278,8 +297,18 @@ MEMORY_BUDGET_MB = max(2000, int((total_memory_mb() or 4000) * 0.6))
 # ==== inference engine (no Kivy below until the UI section) ===================================
 
 def external_model_dir():
-    """Folder the Models menu downloads into: %LOCALAPPDATA%\\QwenChat\\models"""
+    """Folder the Models menu downloads into: the "models" folder next to the app (see MODEL_DIR)."""
     return MODEL_DIR
+
+
+def model_folders():
+    """Folders searched for .gguf files: the download folder first, then the others (no duplicates)."""
+    folders = []
+    for folder in (MODEL_DIR, BUNDLED_MODEL_DIR, LEGACY_MODEL_DIR):
+        if folder and os.path.normcase(os.path.abspath(folder)) not in \
+                [os.path.normcase(os.path.abspath(f)) for f in folders]:
+            folders.append(folder)
+    return folders
 
 
 # Models that work with this app: all use the ChatML chat format that chatml() writes.
@@ -312,7 +341,7 @@ MODELS = [
 
 def model_path(model):
     """Where this model's file is on the PC (downloaded, or copied next to the app), or None."""
-    for folder in (external_model_dir(), BUNDLED_MODEL_DIR):
+    for folder in model_folders():
         if folder:
             path = os.path.join(folder, model["file"])
             if os.path.isfile(path):
@@ -353,9 +382,9 @@ def save_settings(**changes):
 
 
 def all_model_files():
-    """Every .gguf on the PC: downloaded ones first, then the ones in the app's own models folder."""
+    """Every .gguf in the model folders (see model_folders())."""
     files = []
-    for folder in (external_model_dir(), BUNDLED_MODEL_DIR):
+    for folder in model_folders():
         if folder and os.path.isdir(folder):
             files += sorted(glob.glob(os.path.join(folder, "*.gguf")))
     return files
@@ -1316,7 +1345,7 @@ class ModelsMenu(ModalView):
             button("In use", hex_color("#8696A0"), None)
         elif path:
             button("Use", SEND_GREEN, lambda: self.app.switch_model(path))
-            if deletable and path.startswith(external_model_dir()):
+            if deletable and any(os.path.normcase(path).startswith(os.path.normcase(f)) for f in model_folders()):
                 button("Delete", hex_color("#D9534F"), lambda: self.app.delete_model(path))
         elif downloading:
             self.row_widgets[model["file"]] = button("...", hex_color("#8696A0"), None)
