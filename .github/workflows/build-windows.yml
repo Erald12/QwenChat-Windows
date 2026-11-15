@@ -64,9 +64,17 @@ jobs:
       - name: Check main.py compiles
         run: python -m py_compile main.py
 
-      - name: Build QwenChat.exe with PyInstaller
-        timeout-minutes: 15    # normally 2-4 min; a hang (e.g. a Kivy error MessageBox) fails fast
-        run: pyinstaller --noconfirm qwenchat.spec
+      - name: Build QwenChat.exe with cx_Freeze
+        timeout-minutes: 15    # normally a few minutes; a hang fails fast instead of running for hours
+        run: python setup_exe.py build_exe
+
+      - name: Check the app folder has its key files
+        run: |
+          $missing = "QwenChat.exe", "chatbridge.dll", "SDL2.dll", "glew32.dll", "libEGL.dll",
+                     "assets/icon.png", "lib/kivy/data", "lib/kivy/core/window" |
+                     Where-Object { -not (Test-Path (Join-Path dist/QwenChat $_)) }
+          if ($missing) { throw "Missing from dist/QwenChat: $($missing -join ', ')" }
+          Get-ChildItem dist/QwenChat | Select-Object Name, Length
 
       - name: Zip the app
         run: |

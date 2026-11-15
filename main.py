@@ -23,12 +23,13 @@ import threading
 import time
 
 IS_WINDOWS = sys.platform == "win32"
-FROZEN = getattr(sys, "frozen", False)  # running as the PyInstaller .exe
+FROZEN = getattr(sys, "frozen", False)  # running as QwenChat.exe (cx_Freeze)
 
-# Files that ship with the app (assets, chatbridge.dll): next to main.py, or inside the .exe
-RESOURCE_DIR = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
 # Folder that holds QwenChat.exe (or main.py): a "models" folder here is used too (portable use)
 APP_DIR = os.path.dirname(os.path.abspath(sys.executable if FROZEN else __file__))
+# Files that ship with the app (assets, chatbridge.dll): next to QwenChat.exe / main.py
+# (_MEIPASS: inside a PyInstaller build, should one ever be used again)
+RESOURCE_DIR = getattr(sys, "_MEIPASS", APP_DIR)
 # Per-user data: downloaded models, settings, logs.  %LOCALAPPDATA%\QwenChat
 DATA_DIR = os.path.join(os.environ.get("LOCALAPPDATA") or os.path.expanduser("~"),
                         "QwenChat" if IS_WINDOWS else ".qwenchat")

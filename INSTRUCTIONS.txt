@@ -33,7 +33,7 @@ Option B - build it on your PC:
 2. START IT
 -----------
     Open the QwenChat folder and double-click QwenChat.exe.
-    Keep all files of the folder together - QwenChat.exe needs the _internal folder next to it.
+    Keep all files of the folder together - QwenChat.exe needs the lib folder and the DLLs next to it.
     You can right-click QwenChat.exe -> "Send to" -> "Desktop (create shortcut)".
 
     "Windows protected your PC"? The app isn't code-signed. Click "More info" -> "Run anyway".

@@ -23,8 +23,9 @@ $python = ".venv-build\Scripts\python.exe"
 & $python -m pip install -r requirements.txt
 if ($LASTEXITCODE -ne 0) { throw "pip install failed" }
 
-& $python -m PyInstaller --noconfirm qwenchat.spec
-if ($LASTEXITCODE -ne 0) { throw "PyInstaller failed" }
+if (Test-Path "dist\QwenChat") { Remove-Item -Recurse -Force "dist\QwenChat" }  # no leftovers from older builds
+& $python setup_exe.py build_exe
+if ($LASTEXITCODE -ne 0) { throw "cx_Freeze failed" }
 
 New-Item -ItemType Directory -Force "dist\QwenChat\models" | Out-Null
 Write-Host ""

@@ -5,7 +5,7 @@ the same llama.cpp engine, running **Qwen2.5-Instruct** on the PC's CPU. There's
 server. The internet is used only to download a model from the in-app **Models** menu.
 
 ```
-main.py  (Kivy UI + ChatEngine)          QwenChat.exe (PyInstaller, Python 3.12)
+main.py  (Kivy UI + ChatEngine)          QwenChat.exe (cx_Freeze, Python 3.12)
    │  ctypes
    ▼
 chatbridge.dll  (native/chat_bridge.cpp + llama.cpp, statically linked, MSVC x64, AVX2)
@@ -73,7 +73,7 @@ logic as on the phone halves the context if a model doesn't fit the budget.
 
 ### With GitHub Actions (no tools needed on your PC)
 Push this folder as its own repository. `.github/workflows/build-windows.yml` builds `chatbridge.dll`
-with Visual Studio 2022, checks that it loads, builds `QwenChat.exe` with PyInstaller and uploads
+with Visual Studio 2022, checks that it loads, builds `QwenChat.exe` with cx_Freeze and uploads
 **QwenChat-windows-x64.zip** (Actions → the run → Artifacts). The first run takes about 15–25 minutes.
 Later runs reuse the cached DLL. *Run workflow* lets you uncheck AVX2 for PCs from before ~2013.
 
@@ -83,7 +83,7 @@ Later runs reuse the cached DLL. *Run workflow* lets you uncheck AVX2 for PCs fr
 2. `powershell -ExecutionPolicy Bypass -File build_exe.ps1`
 
    This builds `libs\chatbridge.dll` if it's missing, creates a clean `.venv-build`, and runs
-   PyInstaller. The result is `dist\QwenChat\QwenChat.exe`.
+   cx_Freeze (`setup_exe.py`). The result is `dist\QwenChat\QwenChat.exe`.
 
 ### Just run it
 ```

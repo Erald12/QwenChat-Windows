@@ -10,5 +10,5 @@ pywin32>=306; sys_platform == "win32"
 # HTTPS certificates for model downloads inside the .exe
 certifi
 
-# Builds QwenChat.exe (qwenchat.spec)
-pyinstaller==6.11.1
+# Builds QwenChat.exe (setup_exe.py)
+cx_Freeze==8.7.2
