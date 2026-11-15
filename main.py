@@ -54,6 +54,13 @@ if IS_WINDOWS:
     # ANGLE draws through DirectX, which every Windows PC has working drivers for. Plain OpenGL fails
     # on some laptops, virtual machines and remote desktop. Override with KIVY_GL_BACKEND=glew.
     os.environ.setdefault("KIVY_GL_BACKEND", "angle_sdl2")
+if FROZEN:
+    # kivy_deps.sdl2/glew/angle run os.path.join(site.USER_BASE, ...) on import, but in the frozen
+    # .exe site.USER_BASE is None -> TypeError before the window opens. Any real folder works:
+    # their DLLs sit next to QwenChat.exe, where Windows finds them anyway.
+    import site
+    if site.USER_BASE is None:
+        site.USER_BASE = APP_DIR
 
 
 # ==== window geometry (Windows) ==============================================================
